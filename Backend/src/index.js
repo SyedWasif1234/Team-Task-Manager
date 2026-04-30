@@ -32,8 +32,8 @@ import dashboardRouter from './routers/dashboard.router.js';
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/teams', teamRouter);
-app.use('/api/v1', projectRouter); // projectRouter has /teams/:teamId/projects and /projects/:projectId
-app.use('/api/v1', taskRouter);    // taskRouter has /projects/:projectId/tasks and /tasks/:taskId
+app.use('/api/v1', projectRouter); 
+app.use('/api/v1', taskRouter);    
 app.use('/api/v1/dashboard', dashboardRouter);
 
 // --- 4. Global Error Handler (MUST BE LAST) ---

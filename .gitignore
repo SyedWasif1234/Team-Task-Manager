@@ -15,4 +15,4 @@ backend/build/
 .DS_Store
 
 # Ignore data base
-backend/generated/prisma
+backend/prisma
