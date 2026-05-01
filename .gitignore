@@ -14,5 +14,4 @@ backend/build/
 # Ignore OS-specific files
 .DS_Store
 
-# Ignore data base
-backend/prisma
+
