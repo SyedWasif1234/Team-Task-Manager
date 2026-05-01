@@ -1,4 +1,4 @@
-﻿# Team Task Manager Backend
+# Team Task Manager Backend
 
 Welcome to the **Team Task Manager Backend**! This server handles everything needed to manage teams, projects, and tasks for your application.
 
@@ -12,6 +12,18 @@ Here is a simple breakdown of what it handles:
 - **Projects**: Inside a team, you can create multiple projects to organize your work.
 - **Tasks**: Inside a project, you can create tasks, assign them to team members, set a priority (Low, Medium, High, Critical), and track their status (To Do, In Progress, Review, Done).
 - **Dashboard**: Get a quick summary of how many tasks are done, pending, or overdue.
+
+## 📁 Backend Folder Structure & Architecture
+
+The backend follows a layered architecture to keep code organized and maintainable:
+- **`controllers/`**: Handles incoming API calls, validates requests, and sends responses.
+- **`services/`**: Contains the main business logic. Controllers pass data here for processing.
+- **`repositories/`**: Handles all direct database queries and interactions (Data Access Layer).
+- **`routers/`**: Defines the API endpoints and maps them to their respective controllers.
+- **`middlewares/`**: Functions that run before requests reach the controller (e.g., authentication checks, error handling).
+- **`dtos/`**: Data Transfer Objects used to structure, validate, and format request/response data.
+- **`exceptions/`**: Custom error classes for consistent error handling across the application.
+- **`lib/`**: Shared utilities, configurations, and external integrations.
 
 ---
 
@@ -69,22 +81,17 @@ npx prisma migrate dev --name "describe_your_change_here"
 
 # Team Task Manager Frontend
 
-# React + Vite
+Welcome to the **Team Task Manager Frontend**! This is the user interface of the application, built with React and Vite.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 📁 Frontend Folder Structure & Architecture
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The frontend code is structured to maximize component reusability and separation of concerns:
+- **`components/`**: Reusable UI elements and layout sections (e.g., buttons, forms, navigation bars, modals).
+- **`pages/`**: The main view components that represent different screens/routes in the app (e.g., Dashboard, Login, Project View).
+- **`api/`**: Contains the functions and Axios instances used to make HTTP requests to the backend APIs.
+- **`stores/`**: Global state management (e.g., Zustand) for handling user sessions, tasks, and shared UI state.
+- **`utils/`**: Helper functions, formatters, and shared utility logic used across different components.
+- **`assets/`**: Static files such as images, icons, and global CSS stylesheets.
 
 
 
