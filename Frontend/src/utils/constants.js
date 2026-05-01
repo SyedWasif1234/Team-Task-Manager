@@ -1,5 +1,5 @@
 // API base URL — goes through Vite proxy in development
-export const API_BASE = '/api/v1';
+export const API_BASE = import.meta.env.VITE_API_BASE || '/api/v1';
 
 // Task statuses in display order
 export const TASK_STATUSES = ['TODO', 'IN_PROGRESS', 'IN_REVIEW', 'DONE'];
