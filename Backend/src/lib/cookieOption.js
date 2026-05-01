@@ -3,18 +3,18 @@ const isProduction = process.env.NODE_ENV === "production";
 export const getCookieOptions = () => {
   return {
     httpOnly: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days (matches JWT expiry)
+    maxAge: 7 * 24 * 60 * 60 * 1000,
     secure: isProduction,
-    sameSite: isProduction ? "lax" : "lax",
+    sameSite: isProduction ? "none" : "lax", 
     path: "/",
   };
 };
 
 export const clearCookieOptions = () => {
-  return {
+   return {
     httpOnly: true,
     secure: isProduction,
-    sameSite: isProduction ? "lax" : "lax",
+    sameSite: isProduction ? "none" : "lax", // ✅ FIX
     path: "/",
   };
 };
