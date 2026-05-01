@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
-router.get("/", DashboardController.getMyDashboard);
+router.get("/my-dashboard", DashboardController.getMyDashboard);
 router.get("/team/:teamId", DashboardController.getTeamDashboard);
 
 export default router;

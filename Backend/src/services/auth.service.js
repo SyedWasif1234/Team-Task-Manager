@@ -72,6 +72,7 @@ class AuthService {
     }
 
     const token = this._signToken(user);
+    console.log("Tokem :" , token)
     return { user, token };
   }
 

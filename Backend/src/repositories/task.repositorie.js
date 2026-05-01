@@ -12,8 +12,17 @@ const ASSIGNEE_SELECT = {
 export class TaskRepositorie {
 
   async create({ title, description, priority, dueDate, projectId, createdBy, assigneeId }) {
+    const formattedDate = dueDate ? new Date(dueDate) : null;
     return await db.task.create({
-      data: { title, description, priority, dueDate, projectId, createdBy, assigneeId },
+      data: { 
+        title, 
+        description, 
+        priority, 
+        dueDate: formattedDate, 
+        projectId, 
+        createdBy, 
+        assigneeId 
+      },
       include: { assignee: { select: ASSIGNEE_SELECT } },
     });
   }
@@ -55,16 +64,20 @@ export class TaskRepositorie {
     });
   }
 
-  /** Overdue tasks: dueDate < now AND status != DONE */
-  async findOverdueByAssignee(assigneeId) {
-    return await db.task.findMany({
+  /** Overdue tasks: dueDate < now AND status != DONE (for tasks assigned to OR created by user) */
+  async findOverdueByUser(userId) {
+    const res =  await db.task.findMany({
       where: {
-        assigneeId,
-        status: { not: 'DONE' },
-        dueDate: { lt: new Date() },
+        AND: [
+          { OR: [{ assigneeId: userId }, { createdBy: userId }] },
+          { status: { not: 'DONE' } },
+          { dueDate: { lt: new Date() } },
+        ],
       },
       include: { assignee: { select: ASSIGNEE_SELECT } },
     });
+    console.log("responce from Overdue api :" , res);
+    return res;
   }
 
   /** Overdue tasks for an entire team (across all projects) */
@@ -82,17 +95,30 @@ export class TaskRepositorie {
     });
   }
 
-  /** Count tasks per status for a user's assigned tasks */
-  async countByStatusForAssignee(assigneeId) {
-    const counts = await db.task.groupBy({
-      by: ['status'],
-      where: { assigneeId },
-      _count: { status: true },
+  /** Count tasks per status for tasks assigned to OR created by user */
+  async countByStatusForUser(userId) {
+    // Fetch just the status field for all tasks the user is involved in,
+    // then count them in JavaScript (avoids Prisma groupBy+OR limitation)
+    console.log("user id from cout status api :", userId)
+    const tasks = await db.task.findMany({
+      where: {
+        AND: [
+          { OR: [{ assigneeId: userId }, { createdBy: userId }] },
+        ],
+      },
+      select: { status: true },
     });
-    return counts.reduce((acc, row) => {
-      acc[row.status] = row._count.status;
-      return acc;
-    }, {});
+
+    console.log("tasks from count status api :" , tasks)
+
+    const counts = { TODO: 0, IN_PROGRESS: 0, IN_REVIEW: 0, DONE: 0 };
+    for (const task of tasks) {
+      if (counts[task.status] !== undefined) {
+        counts[task.status]++;
+      }
+    }
+    console.log("counts from countByStatusForUser :" , counts);
+    return counts;
   }
 
   /** Count tasks per status for a whole team */
@@ -109,9 +135,14 @@ export class TaskRepositorie {
   }
 
   async update(taskId, data) {
+    const updateData = { ...data };
+    if (updateData.dueDate) {
+      updateData.dueDate = new Date(updateData.dueDate);
+    }
+    
     return await db.task.update({
       where: { id: taskId },
-      data,
+      data: updateData,
       include: { assignee: { select: ASSIGNEE_SELECT } },
     });
   }

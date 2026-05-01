@@ -60,11 +60,7 @@ class AuthController {
       const cookieOptions = clearCookieOptions();
 
       res.clearCookie("token" , cookieOptions) ;
-      res.clearCookie("drafti.me", {
-          ...cookieOptions,
-          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        });
-
+     
       return res.status(200).json(
         AuthResponceDto.toGenericResponse("Logged out Successfully") 
       )

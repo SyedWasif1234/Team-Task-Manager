@@ -6,7 +6,7 @@ export const getCookieOptions = () => {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days (matches JWT expiry)
     secure: isProduction,
     sameSite: isProduction ? "lax" : "lax",
-    domain: isProduction ? ".drafti.me" : undefined,
+    //domain: isProduction ? ".drafti.me" : undefined,
     path: "/",
   };
 };
@@ -16,7 +16,7 @@ export const clearCookieOptions = () => {
     httpOnly: true,
     secure: isProduction,
     sameSite: isProduction ? "lax" : "lax",
-    domain: isProduction ? ".drafti.me" : undefined,
+    //domain: isProduction ? ".drafti.me" : undefined,
     path: "/",
   };
 };

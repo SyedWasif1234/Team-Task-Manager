@@ -1,5 +1,3 @@
-// DASHBOARD SERVICE — AGGREGATION LOGIC
-
 import TaskRepositorie from '../repositories/task.repositorie.js';
 import TeamRepositorie from '../repositories/team.repositorie.js';
 import ProjectRepositorie from '../repositories/project.repositorie.js';
@@ -8,16 +6,15 @@ import { db } from '../lib/db.js';
 
 class DashboardService {
 
-  /**
-   * Personal dashboard — summary of tasks assigned to the logged-in user
-   */
-  async getPersonalDashboard(userId) {
+  async getMyDashboard(userId) {
+    console.log("userId from getMy dashboard :" , userId)
     const [byStatus, overdueTasks, recentTasks, myTeams] = await Promise.all([
-      TaskRepositorie.countByStatusForAssignee(userId),
-      TaskRepositorie.findOverdueByAssignee(userId),
-      // Last 5 assigned tasks regardless of status
+      TaskRepositorie.countByStatusForUser(userId),
+      TaskRepositorie.findOverdueByUser(userId),
       db.task.findMany({
-        where: { assigneeId: userId },
+        where: {
+          OR: [{ assigneeId: userId }, { createdBy: userId }]
+        },
         orderBy: { updatedAt: 'desc' },
         take: 5,
         include: {
@@ -27,15 +24,20 @@ class DashboardService {
       }),
       TeamRepositorie.findAllByUser(userId),
     ]);
+    console.log("by status:" ,byStatus)
+    console.log("myTeams:", myTeams)
 
-    const totalAssigned =
-      (byStatus.TODO ?? 0) +
-      (byStatus.IN_PROGRESS ?? 0) +
-      (byStatus.IN_REVIEW ?? 0) +
-      (byStatus.DONE ?? 0);
+    // Perform Metrics Math
+    const totalTasks = byStatus.TODO + byStatus.IN_PROGRESS + byStatus.IN_REVIEW + byStatus.DONE;
+    const completedTasks = byStatus.DONE;
+    const pendingTasks = totalTasks - completedTasks;
+    const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
     return {
-      totalAssigned,
+      totalTasks,
+      completedTasks,
+      pendingTasks,
+      progressPercentage, // CRITICAL: Required for frontend progress bar
       byStatus,
       overdue: overdueTasks.length,
       recentTasks,
@@ -49,11 +51,7 @@ class DashboardService {
     };
   }
 
-  /**
-   * Team dashboard — summary of all tasks across a team's projects
-   */
   async getTeamDashboard(teamId, userId) {
-    // Verify user is a team member
     const membership = await TeamRepositorie.findMembership(userId, teamId);
     if (!membership) throw TeamException.accessDenied();
 
@@ -66,7 +64,6 @@ class DashboardService {
     const [byStatus, overdueTasks, recentTasks] = await Promise.all([
       TaskRepositorie.countByStatusForTeam(teamId),
       TaskRepositorie.findOverdueByTeam(teamId),
-      // Last 10 tasks updated across all team projects
       db.task.findMany({
         where: { project: { teamId } },
         orderBy: { updatedAt: 'desc' },
@@ -78,19 +75,18 @@ class DashboardService {
       }),
     ]);
 
-    const totalTasks =
-      (byStatus.TODO ?? 0) +
-      (byStatus.IN_PROGRESS ?? 0) +
-      (byStatus.IN_REVIEW ?? 0) +
-      (byStatus.DONE ?? 0);
+    // Perform Metrics Math
+    const totalTasks = byStatus.TODO + byStatus.IN_PROGRESS + byStatus.IN_REVIEW + byStatus.DONE;
+    const completedTasks = byStatus.DONE;
+    const pendingTasks = totalTasks - completedTasks;
+    const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
     return {
-      team: {
-        id: team.id,
-        name: team.name,
-        avatarColor: team.avatarColor,
-      },
+      team: { id: team.id, name: team.name, avatarColor: team.avatarColor },
       totalTasks,
+      completedTasks,
+      pendingTasks,
+      progressPercentage, // CRITICAL
       byStatus,
       overdue: overdueTasks.length,
       memberCount: team.members?.length ?? 0,

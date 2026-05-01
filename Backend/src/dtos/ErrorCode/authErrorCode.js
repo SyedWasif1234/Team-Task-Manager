@@ -1,4 +1,4 @@
-// AUTH ERROR CODES
+
 
 export const AuthErrorCode = {
   AUTH_INVALID_CREDENTIALS: {

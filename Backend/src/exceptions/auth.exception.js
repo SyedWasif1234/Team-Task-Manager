@@ -33,5 +33,9 @@ export class AuthException extends BaseException{
         return new AuthException(AuthErrorCode.AUTH_FORBIDDEN);
     }
 
+    static userAlreadyExists(){
+        return new AuthException(AuthErrorCode.USER_ALREADY_EXISTS);
+    }
+
 
 }

@@ -11,10 +11,10 @@ router.post("/projects/:projectId/tasks", TaskController.createTask);
 router.get("/projects/:projectId/tasks", TaskController.getTasksByProject);
 
 // Task-level routes
-router.get("/:taskId", TaskController.getTaskById);
-router.put("/:taskId", TaskController.updateTask);
-router.delete("/:taskId", TaskController.deleteTask);
-router.patch("/:taskId/status", TaskController.changeStatus);
-router.patch("/:taskId/assign", TaskController.assignTask);
+router.get("/tasks/:taskId", TaskController.getTaskById);
+router.put("/tasks/:taskId", TaskController.updateTask);
+router.delete("/tasks/:taskId", TaskController.deleteTask);
+router.patch("/tasks/:taskId/status", TaskController.changeStatus);
+router.patch("/tasks/:taskId/assign", TaskController.assignTask);
 
 export default router;
